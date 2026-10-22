@@ -28,6 +28,9 @@ type PostManager interface {
 	MarkRead(ctx context.Context, postID, participantID string) (ReadMarker, error)
 	CountUnread(ctx context.Context, participantID string) (UnreadCount, error)
 	AnswerRSVP(ctx context.Context, in RSVP) (RSVP, error)
+	OfferHelp(ctx context.Context, postID, participantID string) (Offer, error)
+	PickOffer(ctx context.Context, in Pick) (Picked, error)
+	FillCall(ctx context.Context, postID, callerID string) (Filled, error)
 	UseGroups(g Groups)
 }
 

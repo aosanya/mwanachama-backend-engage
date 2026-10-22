@@ -117,3 +117,28 @@ Responses to a post live only in comm's thread; this module stores none.
   page says an event may be changed or cancelled but not who may do it — the
   poster only, a holder of the event power, or both — so the address waits
   for that decision rather than guessing it.
+
+## As built (EN5)
+
+- `POST /posts/{postID}/offers` (`engage.offer.create`) records the caller's
+  I can help on a `sent` volunteer call to one of their groups. The person is
+  bound `from: caller`. One offer per person per call: offering again answers
+  the first offer. A call outside the caller's groups is 404 exactly as an
+  unknown post; any other kind of post, or a filled or cancelled call, is 409
+  `ErrNotAnOpenCall`; no caller is 401 `ErrNoVolunteer`.
+- `POST /posts/{postID}/picks` (`engage.pick.create`) picks one offer by
+  `offer_id`. The picker is bound `from: caller` into `picked_by` and must be
+  the call's `posted_by` (403 `ErrNotThePoster`); the call comes from the
+  address. An offer made to another call is 404 `ErrOfferNotFound`. Once the
+  call has `needed_count` picks a further pick is 409 `ErrCallFull`; picking
+  the same offer again answers the first pick. The answer is `Picked`: the
+  pick and the picked person's `participant_id`, for the host to raise comm's
+  `volunteer_picked` (CM105).
+- `POST /posts/{postID}/filled` (`engage.post.fill`) is the poster's confirm:
+  the call's state becomes `filled`, after which offers and picks are 409
+  `ErrNotAnOpenCall`. The answer is `Filled`: the call and every picked
+  person's `participant_id`, for the host to raise `volunteer_call_filled`.
+  The module calls nothing; the host tells comm.
+- **Not built:** withdrawing an offer, unpicking, and listing a call's offers
+  for the poster. The row did not name them; withdrawal is promised by the
+  offer object's description ("Withdrawable until the call is filled").
