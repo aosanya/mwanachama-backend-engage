@@ -1,0 +1,33 @@
+{
+  "operations": {
+    "create_post": {
+      "method": "POST",
+      "path": "/posts",
+      "call": "CreatePost",
+      "action": "engage.post.create",
+      "status": 201,
+      "title": "Send post",
+      "description": "Send a notice, an event or a volunteer call to chosen groups. It is read-only once sent.",
+      "args": [
+        { "from": "body", "whole": true },
+        { "from": "caller", "as": "posted_by", "into": "PostedBy", "description": "Who sent the post, supplied by the mount. Never read from the request." }
+      ],
+      "returns": [{ "body": true }]
+    },
+    "get_post": {
+      "method": "GET",
+      "path": "/posts/{postID}",
+      "call": "GetPost",
+      "action": "engage.post.read",
+      "title": "Read post",
+      "description": "Read one post with its kind, details and state.",
+      "args": [{ "from": "path", "as": "postID", "description": "The post to read." }],
+      "returns": [{ "body": true }]
+    }
+  },
+  "errors": {
+    "ErrPostNotFound": 404,
+    "ErrInvalidPost": 400,
+    "ErrNoPoster": 401
+  }
+}

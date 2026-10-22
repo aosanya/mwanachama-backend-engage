@@ -52,3 +52,22 @@ which asks comm (CM104, CM105) to act:
 | Picks confirmed | Tells each picked member they were picked; tells the others who offered that the call is filled |
 
 Responses to a post live only in comm's thread; this module stores none.
+
+## As built (EN1)
+
+- `engage.blueprint.json` declares the six objects above; the domain's own
+  spec is `engage.wakala.json`, and `spec/examples/` carries a club and a
+  school so the module is exercised under domains that share none of its
+  host's nouns.
+- The person on an `rsvp`, `attendance`, `offer` and `read_marker` is
+  `participant_id`, because "member" is a host word this module may not use.
+- A volunteer call's "what, when and how many" are `task`, `needed_at`
+  (free text) and `needed_count`; an event's are `starts_at`, `ends_at`,
+  `time_zone` and `place`.
+- `engage.operations.json` declares two addresses, `POST /posts`
+  (`engage.post.create`, poster bound from the caller) and
+  `GET /posts/{postID}` (`engage.post.read`). `AnonymousActions` is empty.
+  The rest of the addresses arrive with EN2–EN5.
+- `domain_agnostic_test.go` skips an identifier reached through a selector,
+  such as the engine's own `spec.Spec.ByRole`: "role" there names a blueprint
+  slot, and a name this module declares is still caught where it is declared.
