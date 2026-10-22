@@ -49,6 +49,20 @@
         { "from": "caller", "as": "participant_id", "description": "Who is counting, supplied by the mount." }
       ],
       "returns": [{ "body": true }]
+    },
+    "answer_rsvp": {
+      "method": "PUT",
+      "path": "/posts/{postID}/rsvp",
+      "call": "AnswerRSVP",
+      "action": "engage.rsvp.answer",
+      "title": "Answer event",
+      "description": "Answer a sent event to one of the caller's groups with going or not_going. Answering again replaces the answer until the event starts.",
+      "args": [
+        { "from": "body", "whole": true },
+        { "from": "path", "as": "postID", "into": "PostID", "description": "The event answered. The address decides, not the body." },
+        { "from": "caller", "as": "participant_id", "into": "ParticipantID", "description": "Who answered, supplied by the mount. Never read from the request." }
+      ],
+      "returns": [{ "body": true }]
     }
   },
   "errors": {
@@ -56,6 +70,10 @@
     "ErrInvalidPost": 400,
     "ErrNoPoster": 401,
     "ErrNoReader": 401,
-    "ErrNotANotice": 409
+    "ErrNotANotice": 409,
+    "ErrNoResponder": 401,
+    "ErrInvalidRSVP": 400,
+    "ErrNotAnOpenEvent": 409,
+    "ErrEventStarted": 409
   }
 }

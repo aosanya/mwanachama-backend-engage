@@ -12,11 +12,15 @@ type Route = httpwire.Route
 type Mount = dispatch.Mount
 
 var Sentinels = map[string]error{
-	"ErrPostNotFound": engage.ErrPostNotFound,
-	"ErrInvalidPost":  engage.ErrInvalidPost,
-	"ErrNoPoster":     engage.ErrNoPoster,
-	"ErrNoReader":     engage.ErrNoReader,
-	"ErrNotANotice":   engage.ErrNotANotice,
+	"ErrPostNotFound":   engage.ErrPostNotFound,
+	"ErrInvalidPost":    engage.ErrInvalidPost,
+	"ErrNoPoster":       engage.ErrNoPoster,
+	"ErrNoReader":       engage.ErrNoReader,
+	"ErrNotANotice":     engage.ErrNotANotice,
+	"ErrNoResponder":    engage.ErrNoResponder,
+	"ErrInvalidRSVP":    engage.ErrInvalidRSVP,
+	"ErrNotAnOpenEvent": engage.ErrNotAnOpenEvent,
+	"ErrEventStarted":   engage.ErrEventStarted,
 }
 
 var AnonymousActions = []string{}

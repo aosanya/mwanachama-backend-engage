@@ -99,3 +99,21 @@ Responses to a post live only in comm's thread; this module stores none.
 - **Read-only once sent** holds because no address edits a post's title,
   body or groups; the event changes and cancellation EN3 adds touch time,
   place and state only.
+
+## As built (EN3)
+
+- `PUT /posts/{postID}/rsvp` (`engage.rsvp.answer`) records the caller's
+  `going` or `not_going` on an event. The responder is bound `from: caller`
+  and the event from the address; a body naming either is overwritten. One
+  row per person per event: answering again replaces the answer and moves
+  `answered_at`, keeping the row's id.
+- Only a `sent` event takes an answer (409 `ErrNotAnOpenEvent` for a notice,
+  a volunteer call or a cancelled event). An event to none of the caller's
+  groups answers 404 exactly as an unknown post, through the same
+  `UseGroups` reach EN2 built. From `starts_at` on, an answer is refused
+  with 409 `ErrEventStarted`. No caller is 401 `ErrNoResponder`; an answer
+  outside the declared values is 400 `ErrInvalidRSVP`.
+- **Not built: changing an event's time or place, or cancelling it.** This
+  page says an event may be changed or cancelled but not who may do it — the
+  poster only, a holder of the event power, or both — so the address waits
+  for that decision rather than guessing it.

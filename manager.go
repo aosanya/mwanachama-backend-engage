@@ -27,6 +27,7 @@ type PostManager interface {
 	GetPost(ctx context.Context, postID string) (Post, error)
 	MarkRead(ctx context.Context, postID, participantID string) (ReadMarker, error)
 	CountUnread(ctx context.Context, participantID string) (UnreadCount, error)
+	AnswerRSVP(ctx context.Context, in RSVP) (RSVP, error)
 	UseGroups(g Groups)
 }
 
