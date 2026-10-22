@@ -71,3 +71,31 @@ Responses to a post live only in comm's thread; this module stores none.
 - `domain_agnostic_test.go` skips an identifier reached through a selector,
   such as the engine's own `spec.Spec.ByRole`: "role" there names a blueprint
   slot, and a name this module declares is still caught where it is declared.
+
+## As built (EN2)
+
+- **The caller's groups come from the host, through `UseGroups`.** The
+  manager takes a `Groups` function, `func(ctx, callerID) ([]string,
+  error)`, the same shape `mwanachama-backend-forms` takes for its waiting
+  list. It is asked on every read that needs it and its answer is never
+  stored. A manager given none reaches no group: the unread count is 0 and
+  every notice answers a mark-read as a missing one.
+- `POST /posts/{postID}/read` (`engage.read_marker.create`) records that the
+  caller read a notice. The reader is bound `from: caller`; a body naming
+  someone else is ignored. Only a `sent` notice is marked (409
+  `ErrNotANotice` for an event, a volunteer call or a cancelled notice); a
+  notice to none of the caller's groups answers 404 exactly as an unknown
+  post; marking again returns the first marker, so `read_at` is when it was
+  first read. No caller is 401 `ErrNoReader`.
+- `GET /notices/unread` (`engage.notice.count_unread`) answers `{"count": n}`
+  for the Home card: `sent` notices to any of the caller's groups with no
+  marker of theirs. It reads every sent notice and filters by group in Go,
+  because `group_ids` is a JSON column; a Postgres-side filter is a later
+  optimisation, not a behaviour change.
+- **A sent post is returned to the host.** `CreatePost` answers the stored
+  post (id, kind, groups, poster, `posted_at`) and nothing else; the host
+  hands it to comm for the thread in each picked group and the Inbox line.
+  The module calls nothing.
+- **Read-only once sent** holds because no address edits a post's title,
+  body or groups; the event changes and cancellation EN3 adds touch time,
+  place and state only.

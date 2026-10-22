@@ -15,6 +15,8 @@ var Sentinels = map[string]error{
 	"ErrPostNotFound": engage.ErrPostNotFound,
 	"ErrInvalidPost":  engage.ErrInvalidPost,
 	"ErrNoPoster":     engage.ErrNoPoster,
+	"ErrNoReader":     engage.ErrNoReader,
+	"ErrNotANotice":   engage.ErrNotANotice,
 }
 
 var AnonymousActions = []string{}

@@ -25,12 +25,16 @@ type (
 type PostManager interface {
 	CreatePost(ctx context.Context, in Post) (Post, error)
 	GetPost(ctx context.Context, postID string) (Post, error)
+	MarkRead(ctx context.Context, postID, participantID string) (ReadMarker, error)
+	CountUnread(ctx context.Context, participantID string) (UnreadCount, error)
+	UseGroups(g Groups)
 }
 
 type postManager struct {
-	db  *gorm.DB
-	st  *store
-	now func() string
+	db     *gorm.DB
+	st     *store
+	now    func() string
+	groups Groups
 }
 
 func NewPostManager(db *gorm.DB, s *spec.Spec) (PostManager, error) {

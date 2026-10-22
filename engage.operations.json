@@ -23,11 +23,39 @@
       "description": "Read one post with its kind, details and state.",
       "args": [{ "from": "path", "as": "postID", "description": "The post to read." }],
       "returns": [{ "body": true }]
+    },
+    "mark_read": {
+      "method": "POST",
+      "path": "/posts/{postID}/read",
+      "call": "MarkRead",
+      "action": "engage.read_marker.create",
+      "status": 201,
+      "title": "Mark notice read",
+      "description": "Record that the caller has read a sent notice to one of their groups. Marking it again returns the first marker.",
+      "args": [
+        { "from": "path", "as": "postID", "description": "The notice read." },
+        { "from": "caller", "as": "participant_id", "description": "Who read it, supplied by the mount. Never read from the request." }
+      ],
+      "returns": [{ "body": true }]
+    },
+    "count_unread": {
+      "method": "GET",
+      "path": "/notices/unread",
+      "call": "CountUnread",
+      "action": "engage.notice.count_unread",
+      "title": "Unread notices",
+      "description": "How many sent notices to the caller's groups the caller has not read. The groups come from the mount, never from the request, and a mount that supplies none reaches nothing.",
+      "args": [
+        { "from": "caller", "as": "participant_id", "description": "Who is counting, supplied by the mount." }
+      ],
+      "returns": [{ "body": true }]
     }
   },
   "errors": {
     "ErrPostNotFound": 404,
     "ErrInvalidPost": 400,
-    "ErrNoPoster": 401
+    "ErrNoPoster": 401,
+    "ErrNoReader": 401,
+    "ErrNotANotice": 409
   }
 }

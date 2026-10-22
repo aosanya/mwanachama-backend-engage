@@ -113,3 +113,39 @@ func TestAnUnknownPostAnswersNotFound(t *testing.T) {
 		t.Fatalf("status = %d, want 404", res.StatusCode)
 	}
 }
+
+func TestTheReaderComesFromTheCaller(t *testing.T) {
+	pm := newManager(t)
+	pm.UseGroups(func(_ context.Context, id string) ([]string, error) {
+		if id == "actor-2" {
+			return []string{"g-1"}, nil
+		}
+		return nil, nil
+	})
+	mux := http.NewServeMux()
+	for _, rt := range routes.RoutesFor(pm, routes.Mount{Caller: callerFrom}) {
+		mux.HandleFunc(rt.Pattern(""), rt.Handler)
+	}
+	as := func(caller string) *httptest.Server {
+		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			mux.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), callerKey{}, caller)))
+		}))
+		t.Cleanup(srv.Close)
+		return srv
+	}
+	_, p := post(t, as("actor-1"), "/posts", aNotice(""))
+	code, mk := post(t, as("actor-2"), "/posts/"+p["id"].(string)+"/read", map[string]any{"participant_id": "someone-else"})
+	if code != http.StatusCreated || mk["participant_id"] != "actor-2" {
+		t.Fatalf("mark read = %d %v", code, mk)
+	}
+	res, err := http.Get(as("actor-2").URL + "/notices/unread")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer res.Body.Close()
+	var got map[string]any
+	_ = json.NewDecoder(res.Body).Decode(&got)
+	if res.StatusCode != http.StatusOK || got["count"] != float64(0) {
+		t.Fatalf("unread = %d %v", res.StatusCode, got)
+	}
+}
