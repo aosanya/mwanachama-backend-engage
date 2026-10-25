@@ -16,5 +16,8 @@ var (
 	ErrNotAnOpenCall  = errors.New("only a sent volunteer call takes offers and picks")
 	ErrNotThePoster   = errors.New("only the poster picks and fills a volunteer call")
 	ErrOfferNotFound  = errors.New("offer not found")
+	ErrNoAttendee     = errors.New("a check-in needs a caller")
+	ErrOutsideEvent   = errors.New("the event is not on at this time")
+	ErrNotCheckedIn   = errors.New("not checked in")
 	ErrCallFull       = errors.New("the volunteer call already has as many picks as it needs")
 )

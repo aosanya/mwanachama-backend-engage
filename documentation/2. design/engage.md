@@ -113,10 +113,31 @@ Responses to a post live only in comm's thread; this module stores none.
   `UseGroups` reach EN2 built. From `starts_at` on, an answer is refused
   with 409 `ErrEventStarted`. No caller is 401 `ErrNoResponder`; an answer
   outside the declared values is 400 `ErrInvalidRSVP`.
-- **Not built: changing an event's time or place, or cancelling it.** This
-  page says an event may be changed or cancelled but not who may do it — the
-  poster only, a holder of the event power, or both — so the address waits
-  for that decision rather than guessing it.
+- `PATCH /posts/{postID}/event` (`engage.event.change`) changes a `sent`
+  event's `starts_at`, `ends_at`, `time_zone` or `place`; an empty field is
+  kept, and the result must still end after it starts (400
+  `ErrInvalidPost`). `POST /posts/{postID}/cancelled` (`engage.event.cancel`)
+  sets the state to `cancelled`, after which RSVPs, check-ins and further
+  changes are 409 `ErrNotAnOpenEvent`. Both bind the caller (401
+  `ErrNoPoster` without one) and answer `Changed`: the event and the
+  `participant_id` of everyone whose answer is `going`, for the host to tell
+  them through comm. Decision 482 lets the poster or any holder of Post an
+  event in that group do either; the module does not check who, because it
+  knows no powers — that is the host's gate on the two actions.
+- `POST /posts/{postID}/checkin` (`engage.attendance.check_in_self`) checks
+  the caller in to a `sent` event to one of their groups, only from
+  `starts_at` until `ends_at` (409 `ErrOutsideEvent` otherwise), with no
+  proof. No caller is 401 `ErrNoAttendee`.
+- `PUT /posts/{postID}/attendance/{participantID}`
+  (`engage.attendance.check_in`) is the holder's check-in: anyone in the
+  event's groups (asked of `UseGroups` for that person; anyone else is 404),
+  on the day `starts_at` falls on in the event's `time_zone` (UTC when the
+  zone does not load). `checked_in_by` is the caller.
+  `DELETE /posts/{postID}/attendance/{participantID}`
+  (`engage.attendance.untick`) sets `unticked` and keeps the row (404
+  `ErrNotCheckedIn` when there is none); a later check-in by either address
+  ticks the same row again and moves `checked_in_at`. That only a holder
+  reaches these two is the host's gate.
 
 ## As built (EN5)
 
