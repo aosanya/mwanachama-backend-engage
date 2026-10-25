@@ -14,7 +14,7 @@ func aCall(needed int) engage.Post {
 		Title:       "Stewards wanted",
 		GroupIDs:    []string{"g-1"},
 		Task:        "Hand out water",
-		NeededAt:    "Saturday morning",
+		StartsAt:    "2030-06-01T09:00:00Z",
 		NeededCount: needed,
 		PostedBy:    "actor-1",
 	}
@@ -82,3 +82,85 @@ func TestVolunteerActsAreRefusedWhereTheyDoNotBelong(t *testing.T) {
 }
 
 func second[T any](_ T, err error) error { return err }
+
+func TestACallClosesWithFewerPicksAndIsCancelledWithNone(t *testing.T) {
+	ctx := context.Background()
+	pm := newTestManager(t)
+	pm.UseGroups(groupsFixed(map[string][]string{"p-1": {"g-1"}}))
+	short, _ := pm.CreatePost(ctx, aCall(3))
+	o, _ := pm.OfferHelp(ctx, short.ID, "p-1")
+	if _, err := pm.PickOffer(ctx, engage.Pick{PostID: short.ID, OfferID: o.ID, PickedBy: "actor-1"}); err != nil {
+		t.Fatal(err)
+	}
+	filled, err := pm.FillCall(ctx, short.ID, "actor-1")
+	if err != nil || filled.Post.State != "filled" || len(filled.ParticipantIDs) != 1 {
+		t.Fatalf("closing with one of three = %+v, %v", filled, err)
+	}
+	empty, _ := pm.CreatePost(ctx, aCall(2))
+	pm.OfferHelp(ctx, empty.ID, "p-1")
+	closed, err := pm.FillCall(ctx, empty.ID, "actor-1")
+	if err != nil || closed.Post.State != "cancelled" || len(closed.ParticipantIDs) != 0 {
+		t.Fatalf("closing with none picked = %+v, %v", closed, err)
+	}
+	if got, _ := pm.GetPost(ctx, empty.ID); got.State != "cancelled" {
+		t.Fatalf("state = %q, want cancelled", got.State)
+	}
+}
+
+func TestAVolunteerWithdrawsUntilPickedAndThePosterUnpicks(t *testing.T) {
+	ctx := context.Background()
+	pm := newTestManager(t)
+	pm.UseGroups(groupsFixed(map[string][]string{"p-1": {"g-1"}, "p-2": {"g-1"}}))
+	call, _ := pm.CreatePost(ctx, aCall(2))
+	o1, _ := pm.OfferHelp(ctx, call.ID, "p-1")
+	gone, err := pm.WithdrawOffer(ctx, call.ID, "p-1")
+	if err != nil || gone.ID != o1.ID {
+		t.Fatalf("WithdrawOffer = %+v, %v", gone, err)
+	}
+	if _, err := pm.WithdrawOffer(ctx, call.ID, "p-1"); !errors.Is(err, engage.ErrOfferNotFound) {
+		t.Fatalf("withdrawing twice: err = %v", err)
+	}
+	if _, err := pm.PickOffer(ctx, engage.Pick{PostID: call.ID, OfferID: o1.ID, PickedBy: "actor-1"}); !errors.Is(err, engage.ErrOfferNotFound) {
+		t.Fatalf("picking a withdrawn offer: err = %v", err)
+	}
+	o2, _ := pm.OfferHelp(ctx, call.ID, "p-2")
+	picked, _ := pm.PickOffer(ctx, engage.Pick{PostID: call.ID, OfferID: o2.ID, PickedBy: "actor-1"})
+	if _, err := pm.WithdrawOffer(ctx, call.ID, "p-2"); !errors.Is(err, engage.ErrOfferPicked) {
+		t.Fatalf("withdrawing a picked offer: err = %v", err)
+	}
+	if _, err := pm.Unpick(ctx, call.ID, picked.Pick.ID, "p-2"); !errors.Is(err, engage.ErrNotThePoster) {
+		t.Fatalf("unpick by someone else: err = %v", err)
+	}
+	un, err := pm.Unpick(ctx, call.ID, picked.Pick.ID, "actor-1")
+	if err != nil || un.ParticipantID != "p-2" {
+		t.Fatalf("Unpick = %+v, %v", un, err)
+	}
+	if _, err := pm.Unpick(ctx, call.ID, picked.Pick.ID, "actor-1"); !errors.Is(err, engage.ErrPickNotFound) {
+		t.Fatalf("unpicking twice: err = %v", err)
+	}
+	if _, err := pm.WithdrawOffer(ctx, call.ID, "p-2"); err != nil {
+		t.Fatalf("withdrawing once unpicked: err = %v", err)
+	}
+	if _, err := pm.WithdrawOffer(ctx, call.ID, ""); !errors.Is(err, engage.ErrNoVolunteer) {
+		t.Fatalf("withdraw with no caller: err = %v", err)
+	}
+}
+
+func TestACallNamesAStartAndAnyEndAfterIt(t *testing.T) {
+	ctx := context.Background()
+	pm := newTestManager(t)
+	noStart := aCall(1)
+	noStart.StartsAt = ""
+	backwards := aCall(1)
+	backwards.EndsAt = "2030-06-01T08:00:00Z"
+	for name, p := range map[string]engage.Post{"no start": noStart, "end before start": backwards} {
+		if _, err := pm.CreatePost(ctx, p); !errors.Is(err, engage.ErrInvalidPost) {
+			t.Errorf("%s: err = %v, want ErrInvalidPost", name, err)
+		}
+	}
+	window := aCall(1)
+	window.EndsAt = "2030-06-01T12:00:00Z"
+	if _, err := pm.CreatePost(ctx, window); err != nil {
+		t.Fatalf("a call with a window: err = %v", err)
+	}
+}

@@ -29,6 +29,8 @@ var Sentinels = map[string]error{
 	"ErrNoAttendee":     engage.ErrNoAttendee,
 	"ErrOutsideEvent":   engage.ErrOutsideEvent,
 	"ErrNotCheckedIn":   engage.ErrNotCheckedIn,
+	"ErrOfferPicked":    engage.ErrOfferPicked,
+	"ErrPickNotFound":   engage.ErrPickNotFound,
 }
 
 var AnonymousActions = []string{}

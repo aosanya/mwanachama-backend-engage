@@ -39,6 +39,9 @@ func postHolds(p Post) error {
 		if p.NeededCount < 1 {
 			return fmt.Errorf("a volunteer call needs at least one person")
 		}
+		if p.StartsAt == "" || (p.EndsAt != "" && p.EndsAt <= p.StartsAt) {
+			return fmt.Errorf("a volunteer call names a start and any end after it")
+		}
 	}
 	return nil
 }

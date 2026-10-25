@@ -20,4 +20,6 @@ var (
 	ErrOutsideEvent   = errors.New("the event is not on at this time")
 	ErrNotCheckedIn   = errors.New("not checked in")
 	ErrCallFull       = errors.New("the volunteer call already has as many picks as it needs")
+	ErrOfferPicked    = errors.New("a picked offer is not withdrawn; the poster unpicks it")
+	ErrPickNotFound   = errors.New("pick not found")
 )

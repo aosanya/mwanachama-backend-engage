@@ -14,7 +14,6 @@ type Post struct {
 	TimeZone    string   `json:"time_zone,omitempty"`
 	Place       string   `json:"place,omitempty"`
 	Task        string   `json:"task,omitempty"`
-	NeededAt    string   `json:"needed_at,omitempty"`
 	NeededCount int      `json:"needed_count,omitempty"`
 }
 

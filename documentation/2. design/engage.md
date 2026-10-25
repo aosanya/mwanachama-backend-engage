@@ -4,10 +4,10 @@
 
 | Object | Holds |
 |---|---|
-| `post` | Its kind (`notice`, `event`, `volunteer_call`); title and body; the groups it goes to (opaque group ids); who posted it (from the caller); posted at; its state (`sent`, `cancelled`, and for a volunteer call `filled`). An event adds starts at, ends at, time zone and place; a volunteer call adds what, when and how many. |
+| `post` | Its kind (`notice`, `event`, `volunteer_call`); title and body; the groups it goes to (opaque group ids); who posted it (from the caller); posted at; its state (`sent`, `cancelled`, and for a volunteer call `filled`). An event adds starts at, ends at, time zone and place; a volunteer call adds what, a start time with an optional end, and how many. |
 | `rsvp` | An event, a member id from the caller, `going` or `not_going`, answered at. One per member per event; replaced until the event starts. |
 | `attendance` | An event, a member id, checked in at, by whom (the member themselves or a holder), and whether it is unticked. |
-| `offer` | A volunteer call, a member id from the caller, offered at. One per member per call; withdrawable until the call is filled. |
+| `offer` | A volunteer call, a member id from the caller, offered at. One per member per call; withdrawable while the call is open, until it is picked. |
 | `pick` | A volunteer call, an offer, picked at, by whom. |
 | `read_marker` | A notice, a member id from the caller, read at. Its absence is what makes a notice unread. |
 
@@ -36,9 +36,11 @@ check-in by either path ticks it again.
 
 ## Volunteer calls
 
-Members offer while the call is `sent`. The poster picks from the offers, no
-more than how many; confirming the picks sets the call `filled`, after which
-no offer is taken.
+Members offer while the call is `sent`, and withdraw their offer until it is
+picked. The poster picks from the offers, no more than how many, and may
+unpick. The poster may close the call with fewer picks than how many: with at
+least one pick it becomes `filled`, with none it becomes `cancelled`; either
+way no offer is taken after (decision 483).
 
 ## What comm does
 
@@ -163,3 +165,33 @@ Responses to a post live only in comm's thread; this module stores none.
 - **Not built:** withdrawing an offer, unpicking, and listing a call's offers
   for the poster. The row did not name them; withdrawal is promised by the
   offer object's description ("Withdrawable until the call is filled").
+
+## As built (EN6)
+
+Decision 483 (owner, 2026-10-25).
+
+- **Close with fewer picks.** `POST /posts/{postID}/filled` no longer needs
+  `needed_count` picks: with one or more it sets `filled`, with none it sets
+  `cancelled`. `Filled.Post.State` says which, so the host raises
+  `volunteer_call_filled` on a `filled` close; on a `cancelled` one
+  `ParticipantIDs` is empty and there is nobody picked to tell.
+- **Withdraw.** `DELETE /posts/{postID}/offers/mine`
+  (`engage.offer.withdraw`) removes the caller's own offer, the person bound
+  `from: caller`, and answers the offer withdrawn. Only on a `sent` call
+  (409 `ErrNotAnOpenCall` otherwise), only an offer not picked (409
+  `ErrOfferPicked`; the poster unpicks first), 404 `ErrOfferNotFound` when
+  the caller has no offer, 404 for a call outside their groups, 401
+  `ErrNoVolunteer` with no caller. Offering again afterwards makes a new
+  offer.
+- **Unpick.** `DELETE /posts/{postID}/picks/{pickID}` (`engage.pick.delete`)
+  is the poster's (`from: caller`, 403 `ErrNotThePoster`) on a `sent` call;
+  the pick row goes and the offer stays. Answers `Picked` (the pick removed
+  and who it was) for the host; an unknown pick or one on another call is 404
+  `ErrPickNotFound`. A filled or cancelled call is not unpicked.
+- **A start time with an optional end.** `needed_at` (free text) is gone from
+  the blueprint and `Post`. A volunteer call's when is `starts_at`, required,
+  and `ends_at`, optional and after the start when given (400
+  `ErrInvalidPost` otherwise); they are the same two fields an event uses.
+  No client sent `needed_at`, so nothing migrates.
+- **Not built:** listing a call's offers for the poster, and any notice to a
+  volunteer on unpick; the host decides whether comm says anything.

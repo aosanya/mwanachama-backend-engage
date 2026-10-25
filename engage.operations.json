@@ -98,8 +98,8 @@
       "path": "/posts/{postID}/filled",
       "call": "FillCall",
       "action": "engage.post.fill",
-      "title": "Confirm volunteers",
-      "description": "The poster confirms the picks: the call becomes filled and takes no more offers. Answers the call and who was picked, for the host to tell them.",
+      "title": "Close volunteer call",
+      "description": "The poster closes the call, with as many picks as it needs or fewer: with at least one pick it becomes filled, with none it becomes cancelled, and either way it takes no more offers. Answers the call and who was picked, for the host to tell them.",
       "args": [
         { "from": "path", "as": "postID", "description": "The volunteer call confirmed." },
         { "from": "caller", "as": "posted_by", "description": "Who confirmed, supplied by the mount. Must be the poster." }
@@ -173,6 +173,33 @@
         { "from": "caller", "as": "unticked_by", "description": "Who unticked, supplied by the mount." }
       ],
       "returns": [{ "body": true }]
+    },
+    "withdraw_offer": {
+      "method": "DELETE",
+      "path": "/posts/{postID}/offers/mine",
+      "call": "WithdrawOffer",
+      "action": "engage.offer.withdraw",
+      "title": "Withdraw offer",
+      "description": "Take back the caller's own offer to an open volunteer call, until it is picked. Answers the offer withdrawn.",
+      "args": [
+        { "from": "path", "as": "postID", "description": "The volunteer call offered to." },
+        { "from": "caller", "as": "participant_id", "description": "Who withdraws, supplied by the mount. Never read from the request." }
+      ],
+      "returns": [{ "body": true }]
+    },
+    "unpick": {
+      "method": "DELETE",
+      "path": "/posts/{postID}/picks/{pickID}",
+      "call": "Unpick",
+      "action": "engage.pick.delete",
+      "title": "Unpick volunteer",
+      "description": "The poster takes back one pick on an open volunteer call; the offer stays. Answers the pick removed and who it was, for the host to tell them.",
+      "args": [
+        { "from": "path", "as": "postID", "description": "The volunteer call." },
+        { "from": "path", "as": "pickID", "description": "The pick taken back." },
+        { "from": "caller", "as": "posted_by", "description": "Who unpicks, supplied by the mount. Must be the poster." }
+      ],
+      "returns": [{ "body": true }]
     }
   },
   "errors": {
@@ -192,6 +219,8 @@
     "ErrCallFull": 409,
     "ErrNoAttendee": 401,
     "ErrOutsideEvent": 409,
-    "ErrNotCheckedIn": 404
+    "ErrNotCheckedIn": 404,
+    "ErrOfferPicked": 409,
+    "ErrPickNotFound": 404
   }
 }

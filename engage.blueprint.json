@@ -13,12 +13,11 @@
         { "name": "posted_by", "type": "string", "description": "Who sent the post, supplied by the mount. Never read from the request." },
         { "name": "posted_at", "type": "timestamp", "description": "When the post was sent." },
         { "name": "state", "type": "enum", "description": "Where the post is in its life; filled applies to a volunteer call only.", "values": ["sent", "cancelled", "filled"], "required": true },
-        { "name": "starts_at", "type": "timestamp", "description": "When an event starts." },
-        { "name": "ends_at", "type": "timestamp", "description": "When an event ends." },
+        { "name": "starts_at", "type": "timestamp", "description": "When an event starts, or when a volunteer call's help is needed from." },
+        { "name": "ends_at", "type": "timestamp", "description": "When an event ends, or when a volunteer call's help is needed until; optional for a call." },
         { "name": "time_zone", "type": "string", "description": "The IANA time zone an event's day is read in." },
         { "name": "place", "type": "string", "description": "Where an event happens, as free text." },
         { "name": "task", "type": "string", "description": "What a volunteer call asks people to do." },
-        { "name": "needed_at", "type": "string", "description": "When a volunteer call's help is needed, as free text." },
         { "name": "needed_count", "type": "int", "description": "How many people a volunteer call picks." }
       ],
       "indexes": [
@@ -57,7 +56,7 @@
     },
     {
       "role": "offer",
-      "description": "One person's offer to help with a volunteer call. Withdrawable until the call is filled.",
+      "description": "One person's offer to help with a volunteer call. Withdrawable while the call is open and the offer is not picked.",
       "fields": [
         { "name": "id", "type": "string", "description": "Storage key, opaque to callers. Set when the row is written.", "primary": true },
         { "name": "post_id", "type": "string", "description": "The volunteer call offered to.", "required": true },

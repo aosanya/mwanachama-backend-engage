@@ -36,6 +36,8 @@ type PostManager interface {
 	OfferHelp(ctx context.Context, postID, participantID string) (Offer, error)
 	PickOffer(ctx context.Context, in Pick) (Picked, error)
 	FillCall(ctx context.Context, postID, callerID string) (Filled, error)
+	WithdrawOffer(ctx context.Context, postID, participantID string) (Offer, error)
+	Unpick(ctx context.Context, postID, pickID, callerID string) (Picked, error)
 	UseGroups(g Groups)
 }
 
