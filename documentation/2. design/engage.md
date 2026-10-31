@@ -125,7 +125,7 @@ Responses to a post live only in comm's thread; this module stores none.
   `participant_id` of everyone whose answer is `going`, for the host to tell
   them through comm. Decision 482 lets the poster or any holder of Post an
   event in that group do either; the module does not check who, because it
-  knows no powers — that is the host's gate on the two actions.
+  knows no permissions — that is the host's gate on the two actions.
 - `POST /posts/{postID}/checkin` (`engage.attendance.check_in_self`) checks
   the caller in to a `sent` event to one of their groups, only from
   `starts_at` until `ends_at` (409 `ErrOutsideEvent` otherwise), with no

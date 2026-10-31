@@ -18,7 +18,7 @@ Settled by the owner in the member app's
 |---|---|
 | 346 | Engage holds notices, events and meetings, and volunteer calls; donations show as a placeholder until payments are taken up (decision 227). Engage opens with Notices, then Coming up, then Volunteer; the Engage card on Home shows how many notices are unread, and notices get no Home card of their own (decision 328 stands). |
 | 347 | Engage lives in its own module, `mwanachama-backend-engage` (a public repository), built to the declared-domain standard and mounted per agency like voting (decision 341); comm opens each post's group thread and sends its Inbox lines. |
-| 348 | Who may post each kind (a notice, an event or meeting, a volunteer call) is a power per kind, ticked per role (decision 263); owners and agents hold it when no role does (decision 270); a leader reaches the groups inside theirs (decision 266). Holders post from the studio or the member app. |
+| 348 | Who may post each kind (a notice, an event or meeting, a volunteer call) is a permission per kind, ticked per role (decision 263); owners and agents hold it when no role does (decision 270); a leader reaches the groups inside theirs (decision 266). Holders post from the studio or the member app. |
 | 349 | A post goes to the groups picked and is read-only; members respond in a thread on it in the group's chat room, and each post is also an Inbox line. |
 | 350 | An event or meeting has a date, time, place and groups; members say I'm going or Not going beforehand; on the day the poster or a holder checks people in, and members may check themselves in during the event's time with no proof; a holder may untick anyone. |
 | 351 | A volunteer call says what, when and how many; members tap I can help; the poster picks who goes and they are told, and the rest are told it is filled. |
@@ -48,6 +48,6 @@ donation object. Proof of attendance (codes, location, photos).
 ## Identity
 
 The host (`mwanachama-wakala-api`) resolves who is calling, which groups they
-are in and whether they hold the power to post each kind (decision 348). This
+are in and whether they hold the permission to post each kind (decision 348). This
 module receives opaque member and group ids and never learns anything else
 about a person.

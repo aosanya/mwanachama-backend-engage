@@ -9,7 +9,7 @@ count. Donations are a placeholder until payments are taken up.
 
 A standalone Go library with no server of its own. `mwanachama-wakala-api`
 compiles it in and mounts it per agency under `/instances/{id}/engage`; the
-host does identity and the posting-power checks, comm opens each post's
+host does identity and the posting-permission checks, comm opens each post's
 group thread and sends its Inbox lines, and this module sees only opaque
 member and group ids.
 

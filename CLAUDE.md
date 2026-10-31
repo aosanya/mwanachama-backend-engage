@@ -17,13 +17,13 @@ storage is `mwanachama-backend-shared/specstore` and the routes are built by
 `mwanachama-backend-voting` is the nearest template for the file layout.
 
 **Standalone library, no server of its own**, and **no auth model**: every
-address is gated, and the mounting host decides who holds each posting power
+address is gated, and the mounting host decides who holds each posting permission
 and which groups a member belongs to.
 
 ## The rules that matter most
 
-- **Posting is a power per kind, checked by the host** (decision 348). This
-  module never sees roles or powers; it trusts the host's gate in front of
+- **Posting is a permission per kind, checked by the host** (decision 348). This
+  module never sees roles or permissions; it trusts the host's gate in front of
   each posting address.
 - **A post is read-only once sent.** Responses are a thread in each picked
   group's chat room, opened by comm through the host, never stored here
