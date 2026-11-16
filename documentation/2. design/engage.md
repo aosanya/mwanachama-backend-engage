@@ -134,7 +134,8 @@ Responses to a post live only in comm's thread; this module stores none.
   (`engage.attendance.check_in`) is the holder's check-in: anyone in the
   event's groups (asked of `UseGroups` for that person; anyone else is 404),
   on the day `starts_at` falls on in the event's `time_zone` (UTC when the
-  zone does not load). `checked_in_by` is the caller.
+  zone is empty; a zone that does not load is refused when the event is
+  posted or changed, 400 `ErrInvalidPost`). `checked_in_by` is the caller.
   `DELETE /posts/{postID}/attendance/{participantID}`
   (`engage.attendance.untick`) sets `unticked` and keeps the row (404
   `ErrNotCheckedIn` when there is none); a later check-in by either address
