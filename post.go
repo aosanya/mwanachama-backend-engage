@@ -53,6 +53,9 @@ func postHolds(p Post) error {
 	if len(p.GroupIDs) == 0 {
 		return fmt.Errorf("a post goes to at least one group")
 	}
+	if err := zoneLoads(p.TimeZone); err != nil {
+		return err
+	}
 	switch p.Kind {
 	case models.KindEvent:
 		if p.StartsAt == "" || p.EndsAt <= p.StartsAt {
