@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/aosanya/mwanachama-backend-shared/consent"
 	"github.com/aosanya/mwanachama-backend-shared/specstore"
 
 	"github.com/aosanya/mwanachama-backend-engage/models"
@@ -95,6 +96,9 @@ func (m *postManager) CheckInSelf(ctx context.Context, postID, participantID str
 	if participantID == "" {
 		return Attendance{}, ErrNoAttendee
 	}
+	if err := consent.Require(ctx, m.consent, participantID); err != nil {
+		return Attendance{}, err
+	}
 	p, err := m.reachedEvent(ctx, postID, participantID)
 	if err != nil {
 		return Attendance{}, err
@@ -108,6 +112,9 @@ func (m *postManager) CheckInSelf(ctx context.Context, postID, participantID str
 func (m *postManager) CheckIn(ctx context.Context, postID, participantID, callerID string) (Attendance, error) {
 	if callerID == "" {
 		return Attendance{}, ErrNoAttendee
+	}
+	if err := consent.Require(ctx, m.consent, participantID); err != nil {
+		return Attendance{}, err
 	}
 	p, err := m.reachedEvent(ctx, postID, participantID)
 	if err != nil {

@@ -3,6 +3,7 @@ package engage
 import (
 	"context"
 	"fmt"
+	"github.com/aosanya/mwanachama-backend-shared/consent"
 
 	"github.com/aosanya/mwanachama-backend-shared/specstore"
 
@@ -17,9 +18,14 @@ type UnreadCount struct {
 
 func (m *postManager) UseGroups(g Groups) { m.groups = g }
 
+func (m *postManager) UseConsentGate(g consent.Gate) { m.consent = g }
+
 func (m *postManager) MarkRead(ctx context.Context, postID, participantID string) (ReadMarker, error) {
 	if participantID == "" {
 		return ReadMarker{}, ErrNoReader
+	}
+	if err := consent.Require(ctx, m.consent, participantID); err != nil {
+		return ReadMarker{}, err
 	}
 	p, err := m.GetPost(ctx, postID)
 	if err != nil {
