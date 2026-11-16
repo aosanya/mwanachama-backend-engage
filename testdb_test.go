@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"testing"
+	"time"
 
 	"github.com/glebarez/sqlite"
 	"gorm.io/gorm"
@@ -39,12 +40,13 @@ func newTestManager(t *testing.T) engage.PostManager {
 }
 
 func anEvent() engage.Post {
+	start := time.Now().UTC().Add(30 * 24 * time.Hour).Truncate(time.Hour)
 	return engage.Post{
 		Kind:     "event",
 		Title:    "Clean-up day",
 		GroupIDs: []string{"g-1"},
-		StartsAt: "2026-11-01T08:00:00Z",
-		EndsAt:   "2026-11-01T12:00:00Z",
+		StartsAt: start.Format(time.RFC3339),
+		EndsAt:   start.Add(4 * time.Hour).Format(time.RFC3339),
 		TimeZone: "Africa/Nairobi",
 		Place:    "The market",
 		PostedBy: "actor-1",

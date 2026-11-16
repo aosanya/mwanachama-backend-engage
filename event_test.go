@@ -33,7 +33,7 @@ func TestAChangedEventAnswersEveryoneGoing(t *testing.T) {
 	if got.Place != "The school" {
 		t.Fatalf("stored place = %q", got.Place)
 	}
-	if _, err := pm.ChangeEvent(ctx, engage.EventChange{PostID: ev.ID, ChangedBy: "actor-2", EndsAt: "2026-11-01T07:00:00Z"}); !errors.Is(err, engage.ErrInvalidPost) {
+	if _, err := pm.ChangeEvent(ctx, engage.EventChange{PostID: ev.ID, ChangedBy: "actor-2", EndsAt: "2000-01-01T00:00:00Z"}); !errors.Is(err, engage.ErrInvalidPost) {
 		t.Fatalf("backwards change err = %v", err)
 	}
 	c, err := pm.CancelEvent(ctx, ev.ID, "actor-1")
