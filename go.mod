@@ -3,7 +3,7 @@ module github.com/aosanya/mwanachama-backend-engage
 go 1.25.0
 
 require (
-	github.com/aosanya/mwanachama-backend-shared v0.0.0-00010101000000-000000000000
+	github.com/aosanya/mwanachama-backend-shared v0.3.0
 	github.com/glebarez/sqlite v1.11.0
 	gorm.io/gorm v1.31.2
 )
@@ -25,5 +25,3 @@ require (
 	modernc.org/memory v1.5.0 // indirect
 	modernc.org/sqlite v1.23.1 // indirect
 )
-
-replace github.com/aosanya/mwanachama-backend-shared => ../mwanachama-backend-shared
