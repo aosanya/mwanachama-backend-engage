@@ -27,3 +27,7 @@ Until the hub copy gets the MUN696 change the output is not empty. Once it does,
 ## The hub commits carried over
 
 One commit here per group of hub commits, each naming the hub hashes: a32f3cc8 (the event fixture starts thirty days ahead, so the event tests no longer fail once a fixed date passes); ec77c144, b1f9348c, a37f9023 (the consent gate and the withdrawal call); 20050ce0 (a withdrawn person's answers and unpicked offers are hidden, restored and listed); 26b4f365 (a post goes only to groups of its own agency); a4fab15f (the author of a post, pick and change comes from the caller).
+
+## Result of 2026-11-19
+
+The hub gained `routes/build_cover_test.go` (hub 46ff9ba7) after the last result; it now exists here too. The script prints `diff post.go` and the `Only in backend` lines for `zone.go`, `zone_test.go` and `routes/zone_test.go`, and no `Only in hub` line. The full account, with the hub wiring that stays in the hub, is in [hub import drift](hub-import-drift.md).
